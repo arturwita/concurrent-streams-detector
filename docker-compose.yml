@@ -1,0 +1,15 @@
+version: '2'
+services:
+  node:
+    build: .
+    ports:
+      - "8001:8001"
+    networks:
+      - redis
+  redis:
+    image: redis
+    networks:
+      - redis
+networks:
+  redis:
+    driver: bridge

@@ -1,0 +1,24 @@
+{
+  "name": "concurrent-streams-detector",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arturwita/concurrent-streams-detector.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arturwita/concurrent-streams-detector/issues"
+  },
+  "homepage": "https://github.com/arturwita/concurrent-streams-detector#readme",
+  "dependencies": {
+    "ioredis": "^4.27.9"
+  }
+}
