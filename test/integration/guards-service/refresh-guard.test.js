@@ -37,7 +37,6 @@ describe('Refresh Guard', () => {
         const ttlAfterRefresh = await redis.ttl(redisKey);
         const DEFAULT_TTL = config.get("redis.ttlInSeconds");
 
-        console.log({ttlBeforeRefresh, ttlAfterRefresh });
         expect(ttlBeforeRefresh).toBeLessThan(ttlAfterRefresh);
         expect(ttlAfterRefresh).toBe(DEFAULT_TTL);
     });
