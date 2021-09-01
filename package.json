@@ -19,6 +19,11 @@
   },
   "homepage": "https://github.com/arturwita/concurrent-streams-detector#readme",
   "dependencies": {
-    "ioredis": "^4.27.9"
+    "ajv": "^8.6.2",
+    "dayjs": "^1.10.6",
+    "dotenv": "^10.0.0",
+    "fastify": "^3.20.2",
+    "ioredis": "^4.27.9",
+    "winston": "^3.3.3"
   }
 }
