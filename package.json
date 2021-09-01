@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest test/unit",
-    "test:integration": "jest test/integration",
+    "test": "jest test/unit --runInBand",
+    "test:integration": "jest test/integration --runInBand",
     "start": "node index.js"
   },
   "repository": {
