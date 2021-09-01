@@ -4,11 +4,13 @@ const config = require('config');
 const Redis = require('ioredis');
 const sendRequest = require('./send-request');
 
-describe('Delete Guard', () => {
+describe('Refresh Guard', () => {
     const redis = new Redis({
         port: config.get('redis.port'),
         host: '0.0.0.0'
     });
+
+    const sleep = async timeout => await new Promise(resolve => setInterval(() => resolve(), timeout));
 
     beforeEach(async () => {
         await redis.flushall();
@@ -18,7 +20,7 @@ describe('Delete Guard', () => {
         await redis.disconnect();
     });
 
-    it('Should delete guard with given id', async () => {
+    it("Should refresh guard's expiration time", async () => {
         const userId = 1;
         const { body: { guardId } } = await sendRequest({ method: 'POST', userId });
         const redisKey = `${userId}_${guardId}`;
@@ -26,11 +28,18 @@ describe('Delete Guard', () => {
         const value = await redis.get(redisKey);
         expect(value).not.toBeNull();
 
-        const { statusCode } = await sendRequest({ method: 'DELETE', userId, guardId });
+        await sleep(1000);
+        const ttlBeforeRefresh = await redis.ttl(redisKey);
+
+        const { statusCode } = await sendRequest({ method: 'PATCH', userId, guardId });
         expect(statusCode).toBe(204);
 
-        const valueAfterDeletion = await redis.get(redisKey);
-        expect(valueAfterDeletion).toBeNull();
+        const ttlAfterRefresh = await redis.ttl(redisKey);
+        const DEFAULT_TTL = config.get("redis.ttlInSeconds");
+
+        console.log({ttlBeforeRefresh, ttlAfterRefresh });
+        expect(ttlBeforeRefresh).toBeLessThan(ttlAfterRefresh);
+        expect(ttlAfterRefresh).toBe(DEFAULT_TTL);
     });
 
     it('Should throw error if user tries to delete guard that does not exist', async () => {
@@ -38,7 +47,7 @@ describe('Delete Guard', () => {
         const FAKE_GUARD_ID = "9296522e-cbd1-45ec-bbc9-1e6c1134bd73";
 
         try {
-            await sendRequest({ method: 'DELETE', userId, guardId: FAKE_GUARD_ID })
+            await sendRequest({ method: 'PATCH', userId, guardId: FAKE_GUARD_ID })
         }
         catch (error) {
             expect(error.response.statusCode).toBe(404);

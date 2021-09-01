@@ -4,7 +4,7 @@ const config = require('config');
 const Redis = require('ioredis');
 const sendRequest = require('./send-request');
 
-describe('POST /guards', () => {
+describe('Create Guard', () => {
     const redis = new Redis({
         port: config.get('redis.port'),
         host: '0.0.0.0'
