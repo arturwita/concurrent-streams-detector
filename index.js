@@ -1,17 +1,27 @@
-const Redis = require("ioredis");
-const redis = new Redis({
-    port: 6379,
-    host: "redis",
+"use strict";
+
+require('dotenv').config();
+const errorHandler = require('./src/error/error-handler');
+const guardRoutes = require("./src/router/guard-routes");
+const validatorCompiler = require('./src/validator/validator-compiler');
+const loggerFactory = require("./src/utils/logger");
+const logger = loggerFactory("index");
+
+const fastify = require("fastify")({
+    ignoreTrailingSlash: true
 });
 
-// ioredis supports all Redis commands:
-redis.set("foo", "bar"); // returns promise which resolves to string, "OK"
+fastify.setErrorHandler(errorHandler);
+fastify.setValidatorCompiler(validatorCompiler);
 
-// ioredis supports the node.js callback style
-redis.get("foo", function (err, result) {
-    if (err) {
-        console.error(err);
-    } else {
-        console.log(result); // Promise resolves to "bar"
-    }
-});
+guardRoutes.forEach(route => fastify.register(route));
+
+const host = process.env.APP_HOST || "127.0.0.1";
+const port = process.env.APP_PORT || 3000;
+
+fastify.listen({ port, host })
+    .then(address => logger.info({ message: `Server listening on ${address}` }))
+    .catch(error => {
+        logger.error({ message: 'Error starting server', error });
+        process.exit(1);
+    });
