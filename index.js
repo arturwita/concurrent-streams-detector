@@ -3,15 +3,17 @@
 require('dotenv').config();
 const errorHandler = require('./src/error/error-handler');
 const guardRoutes = require("./src/router/guard-routes");
+const validatorCompiler = require('./src/validator/validator-compiler');
 const loggerFactory = require("./src/utils/logger");
-const logger = loggerFactory("index.js");
+const logger = loggerFactory("index");
 
 const fastify = require("fastify")({
-    ignoreTrailingSlash: true,
-    logger: true
+    ignoreTrailingSlash: true
 });
 
 fastify.setErrorHandler(errorHandler);
+fastify.setValidatorCompiler(validatorCompiler);
+
 guardRoutes.forEach(route => fastify.register(route));
 
 const host = process.env.HOST || "127.0.0.1";
