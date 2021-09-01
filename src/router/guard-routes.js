@@ -1,17 +1,17 @@
 'use strict';
 
+const config = require("config");
 const guardsControllerFactory = require("../controller/guards-controller");
 const guardsServiceFactory = require("../service/guards-service");
 const { guardsRepositoryFactory } = require("../repository/guards-repository");
-const { timeMachineFactory } = require("../utils/time-machine");
-const defaultRedisConfig = require("../../config/redis-config");
+const timeMachineFactory = require("../utils/time-machine");
 const verifyUserId = require("../middleware/verify-user-id");
 const guardIdSchema = require("./validation-schemas/guard-id-schema");
 
 const timeMachine = timeMachineFactory();
 const guardsRepository = guardsRepositoryFactory({
-    port: process.env.REDIS_PORT || defaultRedisConfig.port,
-    host: process.env.REDIS_HOST || defaultRedisConfig.host
+    port: config.get("redis.port"),
+    host: config.get("redis.host")
 });
 const guardsService = guardsServiceFactory({ guardsRepository, timeMachine });
 const guardsController = guardsControllerFactory(guardsService);
