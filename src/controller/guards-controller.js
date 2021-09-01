@@ -2,7 +2,7 @@
 
 const { USER_ID } = require("../router/headers");
 
-const guardsControllerFactory = ({ guardsService }) => {
+const guardsControllerFactory = guardsService => {
     const addGuard = request => {
         const { [USER_ID]: userId } = request.headers;
         return guardsService.addGuard({ userId });

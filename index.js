@@ -16,8 +16,8 @@ fastify.setValidatorCompiler(validatorCompiler);
 
 guardRoutes.forEach(route => fastify.register(route));
 
-const host = process.env.HOST || "127.0.0.1";
-const port = process.env.PORT || 3000;
+const host = process.env.APP_HOST || "127.0.0.1";
+const port = process.env.APP_PORT || 3000;
 
 fastify.listen({ port, host })
     .then(address => logger.info({ message: `Server listening on ${address}` }))

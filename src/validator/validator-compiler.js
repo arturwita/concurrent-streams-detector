@@ -1,13 +1,10 @@
 "use strict";
 
 const Ajv = require('ajv');
-const addFormats = require("ajv-formats")
+const ajvConfig = require("../../config/ajv-config");
+const addFormats = require("ajv-formats");
 
-const ajv = new Ajv({
-    removeAdditional: true,
-    useDefaults: true,
-    coerceTypes: true,
-});
+const ajv = new Ajv(ajvConfig);
 addFormats(ajv);
 
 module.exports = ({ schema }) => ajv.compile(schema);
