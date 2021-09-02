@@ -3,7 +3,7 @@
 const config = require("config");
 const guardsControllerFactory = require("../controller/guards-controller");
 const guardsServiceFactory = require("../service/guards-service");
-const { guardsRepositoryFactory } = require("../repository/guards-repository");
+const guardsRepositoryFactory = require("../repository/guards-repository");
 const timeMachineFactory = require("../utils/time-machine");
 const verifyUserId = require("../middleware/verify-user-id");
 const guardIdSchema = require("./validation-schemas/guard-id-schema");
