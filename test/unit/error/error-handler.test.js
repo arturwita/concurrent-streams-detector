@@ -17,7 +17,7 @@ describe("Error Handler", () => {
         const error = await errorHandler(errorMock, {}, replyMock);
 
         expect(replyMock.code).toHaveReturnedWith(500);
-        expect(error.message).toEqual(errorMock.message);
+        expect(error.message).toEqual("Internal server error");
         expect(error.errorCode).toEqual(errorMock.errorCode);
     });
 
