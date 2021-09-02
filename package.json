@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest test/unit --runInBand",
-    "test:integration": "jest test/integration --runInBand",
+    "test": "NODE_CONFIG_DIR=./test/unit/config/ jest test/unit --runInBand",
+    "test:integration": "NODE_CONFIG_DIR=./test/integration/config/ jest test/integration --runInBand",
     "start": "node index.js"
   },
   "repository": {
