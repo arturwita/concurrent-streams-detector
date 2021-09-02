@@ -31,7 +31,7 @@ describe('Create Guard', () => {
         expect(value).not.toBeNull();
     });
 
-    it('Should throw error if user tries to create more than max guards', async () => {
+    it('Should throw error when user tries to create more than max guards', async () => {
         const MAX_GUARDS_COUNT = config.get('app.maxGuardsCount');
         const userId = 1;
 

@@ -27,9 +27,15 @@ describe("Guards Controller", () => {
         removeGuard: jest.fn(),
     };
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    const guardsController = guardsControllerFactory(guardsServiceMock);
+
     describe("Add Guard", () => {
         it("Should call addGuard with given arguments", () => {
-            guardsControllerFactory(guardsServiceMock).addGuard(requestMock);
+            guardsController.addGuard(requestMock);
             expect(guardsServiceMock.addGuard).toHaveBeenCalledWith({
                 userId: requestMock.headers["x-user-id"]
             });
@@ -38,7 +44,7 @@ describe("Guards Controller", () => {
 
     describe("Refresh Guard", () => {
         it("Should call refreshGuard with given arguments", async () => {
-            await guardsControllerFactory(guardsServiceMock).refreshGuard(requestMock, replyMock);
+            await guardsController.refreshGuard(requestMock, replyMock);
             expect(guardsServiceMock.refreshGuard).toHaveBeenCalledWith({
                 userId: requestMock.headers["x-user-id"],
                 guardId: requestMock.params.id
@@ -48,7 +54,7 @@ describe("Guards Controller", () => {
 
     describe("Remove Guard", () => {
         it("Should call removeGuard with given arguments", async () => {
-            await guardsControllerFactory(guardsServiceMock).removeGuard(requestMock, replyMock);
+            await guardsController.removeGuard(requestMock, replyMock);
             expect(guardsServiceMock.removeGuard).toHaveBeenCalledWith({
                 userId: requestMock.headers["x-user-id"],
                 guardId: requestMock.params.id

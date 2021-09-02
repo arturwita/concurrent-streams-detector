@@ -40,7 +40,7 @@ describe('Refresh Guard', () => {
         expect(ttlAfterRefresh).toBe(DEFAULT_TTL);
     });
 
-    it('Should throw error if user tries to delete guard that does not exist', async () => {
+    it('Should throw error when user tries to delete guard that does not exist', async () => {
         const userId = 1;
         const FAKE_GUARD_ID = "9296522e-cbd1-45ec-bbc9-1e6c1134bd73";
 

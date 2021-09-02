@@ -8,6 +8,10 @@ describe("Error Handler", () => {
         code: jest.fn(status => status),
     };
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
     it("Should return error with default values", async () => {
         const errorMock = {
             message: "error",

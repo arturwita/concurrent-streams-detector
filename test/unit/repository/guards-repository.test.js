@@ -4,6 +4,10 @@ const config = require("config");
 const guardsRepositoryFactory = require("../../../src/repository/guards-repository");
 
 describe("Guards Repository", () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
     describe("Prepare Key", () => {
         it("Should properly prepare redis key", () => {
             const userId = 1;
