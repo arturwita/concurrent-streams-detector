@@ -15,7 +15,10 @@ describe("Verify User Id", () => {
             expect(error.status).toBe(400);
             expect(error.message).toEqual(`${USER_ID} header is required`);
             expect(error.errorCode).toEqual(MIDDLEWARE_ERROR_CODE.MISSING_HEADER);
+            return;
         }
+
+        fail("Test should not reach here");
     });
 
     it("Should throw if user id does not match given schema", async () => {
@@ -33,7 +36,10 @@ describe("Verify User Id", () => {
             expect(error.status).toBe(401);
             expect(error.message).toEqual("Unauthorized");
             expect(error.errorCode).toEqual(HTTP_ERROR_CODE.UNAUTHORIZED);
+            return;
         }
+
+        fail("Test should not reach here");
     });
 });
 
