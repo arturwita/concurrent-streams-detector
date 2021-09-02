@@ -6,17 +6,15 @@ const loggerFactory = require("../utils/logger");
 const CustomError = require("../error/custom-error");
 const { GUARD_DOMAIN_ERROR_CODE } = require("../error/error-codes");
 
-const guardsServiceFactory = ({ guardsRepository, timeMachine }) => {
+const guardsServiceFactory = ({ guardsRepository, timeMachine, generateUuid = getUuidV4 }) => {
     const logger = loggerFactory("guards-service");
 
-    const MAX_GUARDS_COUNT = config.get("app.maxGuardsCount");
-
-    const generateUuid = () => getUuidV4();
+    const MAX_GUARDS_COUNT = Number.parseInt(config.get("app.maxGuardsCount"));
 
     const addGuard = async ({ userId }) => {
         const existingGuards = await guardsRepository.getUserGuards(userId);
 
-        if (existingGuards.length === Number.parseInt(MAX_GUARDS_COUNT)) {
+        if (existingGuards.length === MAX_GUARDS_COUNT) {
             const error = {
                 status: 403,
                 message: "Reached max guards count",
@@ -121,8 +119,7 @@ const guardsServiceFactory = ({ guardsRepository, timeMachine }) => {
     return {
         addGuard,
         refreshGuard,
-        removeGuard,
-        generateUuid
+        removeGuard
     }
 }
 
