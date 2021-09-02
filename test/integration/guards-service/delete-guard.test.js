@@ -67,4 +67,19 @@ describe('Delete Guard', () => {
 
         fail("Test should not reach here");
     });
+
+    it('Should throw error when given guard id and was invalid', async () => {
+        const userId = 1;
+        const invalidGuardId = "invalid_id";
+
+        try {
+            await sendRequest({ method: 'DELETE', userId, guardId: invalidGuardId });
+        }
+        catch (error) {
+            expect(error.response.statusCode).toBe(400);
+            return;
+        }
+
+        fail("Test should not reach here");
+    });
 });

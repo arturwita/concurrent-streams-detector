@@ -19,19 +19,24 @@ describe('Refresh Guard', () => {
         await redis.disconnect();
     });
 
-    it("Should refresh guard's expiration time", async () => {
+    it("Should refresh guard's expiration time and ttl", async () => {
         const userId = 1;
         const { body: { guardId } } = await sendRequest({ method: 'POST', userId });
         const redisKey = `${userId}_${guardId}`;
 
-        const value = await redis.get(redisKey);
-        expect(value).not.toBeNull();
+        const valueBeforeRefresh = await redis.get(redisKey);
+        expect(valueBeforeRefresh).not.toBeNull();
 
         await sleep(1000);
         const ttlBeforeRefresh = await redis.ttl(redisKey);
 
         const { statusCode } = await sendRequest({ method: 'PATCH', userId, guardId });
         expect(statusCode).toBe(204);
+
+        const valueAfterRefresh = await redis.get(redisKey);
+        const expirationTimeBeforeRefresh = new Date(valueBeforeRefresh).getTime();
+        const expirationTimeAfterRefresh = new Date(valueAfterRefresh).getTime();
+        expect(expirationTimeBeforeRefresh).toBeLessThan(expirationTimeAfterRefresh);
 
         const ttlAfterRefresh = await redis.ttl(redisKey);
         const DEFAULT_TTL = config.get("redis.ttlInSeconds");
@@ -51,6 +56,21 @@ describe('Refresh Guard', () => {
             expect(error.response.statusCode).toBe(404);
             expect(error.response.body.message).toBe("Guard does not exist");
             expect(error.response.body.errorCode).toBe("GUARD_DOES_NOT_EXIST");
+            return;
+        }
+
+        fail("Test should not reach here");
+    });
+
+    it('Should throw error when given guard id and was invalid', async () => {
+        const userId = 1;
+        const invalidGuardId = "invalid_id";
+
+        try {
+            await sendRequest({ method: 'PATCH', userId, guardId: invalidGuardId });
+        }
+        catch (error) {
+            expect(error.response.statusCode).toBe(400);
             return;
         }
 
