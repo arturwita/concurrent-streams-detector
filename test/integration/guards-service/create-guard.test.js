@@ -50,6 +50,9 @@ describe('Create Guard', () => {
             expect(error.response.statusCode).toBe(403);
             expect(error.response.body.message).toBe("Reached max guards count");
             expect(error.response.body.errorCode).toBe("REACHED_MAX_GUARDS_COUNT");
+            return;
         }
+
+        fail("Test should not reach here");
     });
 });

@@ -51,6 +51,9 @@ describe('Refresh Guard', () => {
             expect(error.response.statusCode).toBe(404);
             expect(error.response.body.message).toBe("Guard does not exist");
             expect(error.response.body.errorCode).toBe("GUARD_DOES_NOT_EXIST");
+            return;
         }
+
+        fail("Test should not reach here");
     });
 });

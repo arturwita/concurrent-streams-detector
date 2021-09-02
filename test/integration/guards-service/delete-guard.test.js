@@ -44,6 +44,27 @@ describe('Delete Guard', () => {
             expect(error.response.statusCode).toBe(404);
             expect(error.response.body.message).toBe("Guard does not exist");
             expect(error.response.body.errorCode).toBe("GUARD_DOES_NOT_EXIST");
+            return;
         }
+
+        fail("Test should not reach here");
+    });
+
+    it('Should delete guard with given id and fail return 404 after deleting it again', async () => {
+        const userId = 1;
+        const { body: { guardId } } = await sendRequest({ method: 'POST', userId });
+
+        const { statusCode } = await sendRequest({ method: 'DELETE', userId, guardId });
+        expect(statusCode).toBe(204);
+
+        try {
+            await sendRequest({ method: 'DELETE', userId, guardId })
+        }
+        catch (error) {
+            expect(error.response.statusCode).toBe(404);
+            return;
+        }
+
+        fail("Test should not reach here");
     });
 });
