@@ -3,14 +3,13 @@
 const config = require('config');
 const Redis = require('ioredis');
 const sendRequest = require('./send-request');
+const { sleep } = require("../../utils");
 
 describe('Refresh Guard', () => {
     const redis = new Redis({
         port: config.get('redis.port'),
         host: '0.0.0.0'
     });
-
-    const sleep = async timeout => await new Promise(resolve => setInterval(() => resolve(), timeout));
 
     beforeEach(async () => {
         await redis.flushall();

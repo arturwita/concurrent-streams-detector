@@ -8,10 +8,10 @@ describe("Time Machine", () => {
         const getCurrentTimestampMock = jest.fn(() => FAKE_TIMESTAMP);
         const timeMachine = timeMachineFactory(getCurrentTimestampMock);
 
-        const x = timeMachine.getGuardExpirationTime();
+        const expirationTime = timeMachine.getGuardExpirationTime();
 
         const EXPECTED_VALUE = 61;
-        expect(x.getTime()).toBe(EXPECTED_VALUE);
+        expect(expirationTime.getTime()).toBe(EXPECTED_VALUE);
     });
 });
 
