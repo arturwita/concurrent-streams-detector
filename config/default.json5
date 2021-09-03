@@ -15,5 +15,12 @@
     app: {
         maxGuardsCount: 3,
         guardExpirationInSeconds: 60
+    },
+    cors: {
+        methods: ["POST", "PATCH", "DELETE"],
+        origin: "*",
+        maxAge: 86400,
+        allowedHeaders: ["content-type", "x-user-id"],
+        strictPreflight: false
     }
 }

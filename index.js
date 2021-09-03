@@ -8,7 +8,7 @@ const containerFactory = require('./src/dependency-injection/containter-factory'
 const validatorCompiler = require('./src/validator/validator-compiler');
 
 const fastify = fastifyFactory({ ...config.get('fastify') });
-fastify.register(cors);
+fastify.register(cors, config.get('cors'));
 
 const container = containerFactory({ app: fastify, config });
 const {
