@@ -1,14 +1,11 @@
 'use strict';
 
-const config = require('config');
-const { v4: getUuidV4 } = require('uuid');
-const loggerFactory = require('../utils/logger');
 const CustomError = require('../error/custom-error');
 const { GUARD_DOMAIN_ERROR_CODE } = require('../error/error-codes');
 
-const guardsServiceFactory = ({ guardsRepository, timeMachine, generateUuid = getUuidV4 }) => {
-  const logger = loggerFactory('guards-service');
-
+const guardsServiceFactory = ({
+  guardsRepository, config, logger, timeMachine, generateUuid
+}) => {
   const MAX_GUARDS_COUNT = Number.parseInt(config.get('app.maxGuardsCount'), 10);
 
   const addGuard = async ({ userId }) => {

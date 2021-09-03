@@ -2,6 +2,7 @@
 
 module.exports = async (error, request, reply) => {
   let status;
+  console.log(error); // TODO: remove
 
   switch (true) {
     case !!(error.errors || error.validation): {

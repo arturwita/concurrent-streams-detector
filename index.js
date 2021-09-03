@@ -2,26 +2,28 @@
 
 require('dotenv').config();
 const config = require('config');
-const fastify = require('fastify')({ ...config.get('fastify') });
-const errorHandler = require('./src/error/error-handler');
-const guardRoutes = require('./src/router/guard-routes');
-const validatorCompiler = require('./src/validator/validator-compiler');
-const loggerFactory = require('./src/utils/logger');
+const fastifyFactory = require('fastify');
+const containerFactory = require('./src/dependency-injection/containter-factory');
 
-const logger = loggerFactory('index');
+const errorHandler = require('./src/error/error-handler');
+const validatorCompiler = require('./src/validator/validator-compiler');
+const registerRoutes = require('./src/router/register-routes');
+
+const fastify = fastifyFactory({...config.get('fastify')});
+fastify.register(require('fastify-cors'));
+
+const container = containerFactory({app: fastify, config});
+registerRoutes(container);
 
 fastify.setErrorHandler(errorHandler);
 fastify.setValidatorCompiler(validatorCompiler);
 
-guardRoutes.forEach(route => fastify.register(route));
-fastify.register(require('fastify-cors'));
+const {logger} = container.cradle;
+const {host, port} = config.get("app");
 
-const host = process.env.APP_HOST || '127.0.0.1';
-const port = process.env.APP_PORT || 3000;
+fastify.listen({port, host })
+    .catch(error => {
+        logger.error({message: 'Error starting server', error});
+        process.exit(1);
+    });
 
-fastify.listen({ port, host })
-  .then(address => logger.info({ message: `Server listening on ${address}` }))
-  .catch(error => {
-    logger.error({ message: 'Error starting server', error });
-    process.exit(1);
-  });

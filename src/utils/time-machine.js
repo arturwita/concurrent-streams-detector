@@ -1,8 +1,6 @@
 'use strict';
 
-const config = require('config');
-
-const timeMachineFactory = (getCurrentTimestamp = Date.now) => {
+const timeMachineFactory = ({ config }, getCurrentTimestamp = Date.now) => {
   const EXPIRATION = Number.parseInt(config.get('app.guardExpirationInSeconds'), 10);
 
   const getGuardExpirationTime = () => {

@@ -1,8 +1,6 @@
 'use strict';
 
-const config = require('config');
-
-const guardsRepositoryFactory = redis => {
+const guardsRepositoryFactory = ({ config, redis }) => {
   const TTL = config.get('redis.ttlInSeconds');
   const SUCCESSFUL_SAVE_STATUS = 'OK';
   const KEY_SEPARATOR = '_';
