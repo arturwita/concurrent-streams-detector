@@ -3,21 +3,20 @@
 require('dotenv').config();
 const config = require('config');
 const fastifyFactory = require('fastify');
+const cors = require('fastify-cors');
 const containerFactory = require('./src/dependency-injection/containter-factory');
-const errorHandler = require('./src/error/error-handler');
 const validatorCompiler = require('./src/validator/validator-compiler');
 
 const fastify = fastifyFactory({ ...config.get('fastify') });
-fastify.register(require('fastify-cors'));
+fastify.register(cors);
 
 const container = containerFactory({ app: fastify, config });
+const {
+  logger, addGuardRoute, refreshGuardRoute, removeGuardRoute, errorHandler
+} = container.cradle;
 
 fastify.setErrorHandler(errorHandler);
 fastify.setValidatorCompiler(validatorCompiler);
-
-const {
-  logger, addGuardRoute, refreshGuardRoute, removeGuardRoute
-} = container.cradle;
 
 fastify.route(addGuardRoute);
 fastify.route(refreshGuardRoute);

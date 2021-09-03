@@ -11,6 +11,7 @@ const verifyUserIdFactory = require('../middleware/verify-user-id');
 const guardsServiceFactory = require('../service/guards-service');
 const guardsControllerFactory = require('../controller/guards-controller');
 const timeMachineFactory = require('../utils/time-machine');
+const errorHandlerFactory = require('../error/error-handler');
 const { registerAddGuardRoute, registerRefreshGuardRoute, registerRemoveGuardRoute } = require('../router/guard-routes');
 
 const containerFactory = ({ app, config }) => {
@@ -26,6 +27,7 @@ const containerFactory = ({ app, config }) => {
     timeMachine: asFunction(timeMachineFactory),
     generateUuid: asValue(getUuidV4),
     verifyUserId: asFunction(verifyUserIdFactory),
+    errorHandler: asFunction(errorHandlerFactory),
     guardsRepository: asFunction(guardsRepositoryFactory),
     guardsService: asFunction(guardsServiceFactory),
     guardsController: asFunction(guardsControllerFactory),
