@@ -11,10 +11,25 @@ describe('Guards Service', () => {
     getGuardExpirationTime: jest.fn(() => EXPIRATION_TIME)
   };
   const generateUuidMock = jest.fn(() => UUID);
+  const loggerMock = {
+    error: jest.fn()
+  };
+  const expectedMaxGuardsCount = '3';
+  const configMock = {
+    get: jest.fn(() => expectedMaxGuardsCount)
+  };
 
   afterEach(() => {
     jest.clearAllMocks();
   });
+
+  const assertError = ({ error, expectedError }) => {
+    expect(loggerMock.error).toHaveBeenCalledTimes(1);
+    expect(loggerMock.error).toHaveBeenCalledWith(expectedError);
+    expect(error.status).toBe(expectedError.status);
+    expect(error.message).toBe(expectedError.message);
+    expect(error.errorCode).toBe(expectedError.errorCode);
+  };
 
   describe('Add Guard', () => {
     it('Should return created guardId', async () => {
@@ -27,6 +42,8 @@ describe('Guards Service', () => {
 
       const { guardId } = await guardsServiceFactory({
         guardsRepository: guardsRepositoryMock,
+        config: configMock,
+        logger: loggerMock,
         timeMachine: timeMachineMock,
         generateUuid: generateUuidMock
       }).addGuard({ userId });
@@ -47,19 +64,28 @@ describe('Guards Service', () => {
       const guardsRepositoryMock = {
         getUserGuards: jest.fn(() => userGuards)
       };
+      const expectedError = {
+        status: 403,
+        message: 'Reached max guards count',
+        errorCode: 'REACHED_MAX_GUARDS_COUNT'
+      };
 
       try {
         await guardsServiceFactory({
           guardsRepository: guardsRepositoryMock,
           timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock
+          generateUuid: generateUuidMock,
+          logger: loggerMock,
+          config: configMock
         }).addGuard({ userId });
       } catch (error) {
         expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledWith(userId);
-        expect(error.status).toBe(403);
-        expect(error.message).toBe('Reached max guards count');
-        expect(error.errorCode).toBe('REACHED_MAX_GUARDS_COUNT');
+        expect(loggerMock.error).toHaveBeenCalledTimes(1);
+        expect(loggerMock.error).toHaveBeenCalledWith(expectedError);
+        expect(error.status).toBe(expectedError.status);
+        expect(error.message).toBe(expectedError.message);
+        expect(error.errorCode).toBe(expectedError.errorCode);
         return;
       }
 
@@ -73,12 +99,19 @@ describe('Guards Service', () => {
         prepareKey: jest.fn(() => redisKey),
         saveGuard: jest.fn(() => false),
       };
+      const expectedError = {
+        status: 500,
+        message: 'Failed to create guard',
+        errorCode: 'FAILED_TO_CREATE_GUARD'
+      };
 
       try {
         await guardsServiceFactory({
           guardsRepository: guardsRepositoryMock,
           timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock
+          generateUuid: generateUuidMock,
+          logger: loggerMock,
+          config: configMock
         }).addGuard({ userId });
       } catch (error) {
         expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledTimes(1);
@@ -89,9 +122,7 @@ describe('Guards Service', () => {
         expect(timeMachineMock.getGuardExpirationTime).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, EXPIRATION_TIME);
-        expect(error.status).toBe(500);
-        expect(error.message).toBe('Failed to create guard');
-        expect(error.errorCode).toBe('FAILED_TO_CREATE_GUARD');
+        assertError({ error, expectedError });
         return;
       }
 
@@ -114,7 +145,9 @@ describe('Guards Service', () => {
       const { guardId: returnedGuardId } = await guardsServiceFactory({
         guardsRepository: guardsRepositoryMock,
         timeMachine: timeMachineMock,
-        generateUuid: generateUuidMock
+        generateUuid: generateUuidMock,
+        logger: loggerMock,
+        config: configMock
       }).refreshGuard({ userId, guardId });
 
       expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
@@ -132,21 +165,27 @@ describe('Guards Service', () => {
         prepareKey: jest.fn(() => redisKey),
         getGuard: jest.fn(() => null),
       };
+      const expectedError = {
+        status: 404,
+        message: 'Guard does not exist',
+        errorCode: 'GUARD_DOES_NOT_EXIST'
+      };
 
       try {
         await guardsServiceFactory({
           guardsRepository: guardsRepositoryMock,
           timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock
+          generateUuid: generateUuidMock,
+          logger: loggerMock,
+          config: configMock
         }).refreshGuard({ userId, guardId });
       } catch (error) {
         expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
         expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
-        expect(error.status).toBe(404);
-        expect(error.message).toBe('Guard does not exist');
-        expect(error.errorCode).toBe('GUARD_DOES_NOT_EXIST');
+        assertError({ error, expectedError });
+
         return;
       }
 
@@ -159,12 +198,19 @@ describe('Guards Service', () => {
         getGuard: jest.fn(() => guardValue),
         saveGuard: jest.fn(() => false)
       };
+      const expectedError = {
+        status: 500,
+        message: 'Failed to create guard',
+        errorCode: 'FAILED_TO_CREATE_GUARD'
+      };
 
       try {
         await guardsServiceFactory({
           guardsRepository: guardsRepositoryMock,
           timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock
+          generateUuid: generateUuidMock,
+          logger: loggerMock,
+          config: configMock
         }).refreshGuard({ userId, guardId });
       } catch (error) {
         expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
@@ -174,9 +220,8 @@ describe('Guards Service', () => {
         expect(timeMachineMock.getGuardExpirationTime).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, EXPIRATION_TIME);
-        expect(error.status).toBe(500);
-        expect(error.message).toBe('Failed to create guard');
-        expect(error.errorCode).toBe('FAILED_TO_CREATE_GUARD');
+        assertError({ error, expectedError });
+
         return;
       }
 
@@ -199,7 +244,9 @@ describe('Guards Service', () => {
       const { guardId: returnedGuardId } = await guardsServiceFactory({
         guardsRepository: guardsRepositoryMock,
         timeMachine: timeMachineMock,
-        generateUuid: generateUuidMock
+        generateUuid: generateUuidMock,
+        logger: loggerMock,
+        config: configMock
       }).removeGuard({ userId, guardId });
 
       expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
@@ -216,21 +263,27 @@ describe('Guards Service', () => {
         prepareKey: jest.fn(() => redisKey),
         getGuard: jest.fn(() => null),
       };
+      const expectedError = {
+        status: 404,
+        message: 'Guard does not exist',
+        errorCode: 'GUARD_DOES_NOT_EXIST'
+      };
 
       try {
         await guardsServiceFactory({
           guardsRepository: guardsRepositoryMock,
           timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock
+          generateUuid: generateUuidMock,
+          logger: loggerMock,
+          config: configMock
         }).removeGuard({ userId, guardId });
       } catch (error) {
         expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
         expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
-        expect(error.status).toBe(404);
-        expect(error.message).toBe('Guard does not exist');
-        expect(error.errorCode).toBe('GUARD_DOES_NOT_EXIST');
+        assertError({ error, expectedError });
+
         return;
       }
 
@@ -243,12 +296,19 @@ describe('Guards Service', () => {
         getGuard: jest.fn(() => guardValue),
         removeGuard: jest.fn(() => false)
       };
+      const expectedError = {
+        status: 500,
+        message: 'Failed to delete guard',
+        errorCode: 'FAILED_TO_DELETE_GUARD'
+      };
 
       try {
         await guardsServiceFactory({
           guardsRepository: guardsRepositoryMock,
           timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock
+          generateUuid: generateUuidMock,
+          logger: loggerMock,
+          config: configMock
         }).removeGuard({ userId, guardId });
       } catch (error) {
         expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
@@ -257,9 +317,8 @@ describe('Guards Service', () => {
         expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
         expect(guardsRepositoryMock.removeGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.removeGuard).toHaveBeenCalledWith(redisKey);
-        expect(error.status).toBe(500);
-        expect(error.message).toBe('Failed to delete guard');
-        expect(error.errorCode).toBe('FAILED_TO_DELETE_GUARD');
+        assertError({ error, expectedError });
+
         return;
       }
 

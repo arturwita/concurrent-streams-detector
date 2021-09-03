@@ -1,7 +1,8 @@
 'use strict';
 
-module.exports = async (error, request, reply) => {
+module.exports = ({ logger }) => async (error, request, reply) => {
   let status;
+  logger.error(error);
 
   switch (true) {
     case !!(error.errors || error.validation): {
@@ -21,7 +22,7 @@ module.exports = async (error, request, reply) => {
   reply.code(status);
 
   return {
-    message: status === 500 ? 'Internal server error' : error.message,
+    message: status >= 500 ? 'Internal server error' : error.message,
     errorCode: error.errorCode
   };
 };

@@ -5,11 +5,9 @@ const CustomError = require('../error/custom-error');
 const { MIDDLEWARE_ERROR_CODE, HTTP_ERROR_CODE } = require('../error/error-codes');
 const validatorCompiler = require('../validator/validator-compiler');
 const userIdSchema = require('../router/validation-schemas/user-id-schema');
-const loggerFactory = require('../utils/logger');
 
-module.exports = async function (request) {
+module.exports = ({ logger }) => async function (request) {
   const { [USER_ID]: userId } = request.headers;
-  const logger = loggerFactory('verify-user-id');
 
   if (typeof userId !== 'string') {
     const error = {
