@@ -11,7 +11,7 @@ const guardsServiceFactory = ({
   const addGuard = async ({ userId }) => {
     const existingGuards = await guardsRepository.getUserGuards(userId);
 
-    if (existingGuards.length === MAX_GUARDS_COUNT) {
+    if (existingGuards.length >= MAX_GUARDS_COUNT) {
       const error = {
         status: 403,
         message: 'Reached max guards count',
