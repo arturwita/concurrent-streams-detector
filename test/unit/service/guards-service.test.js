@@ -14,7 +14,7 @@ describe('Guards Service', () => {
   const loggerMock = {
     error: jest.fn()
   };
-  const expectedMaxGuardsCount = "3";
+  const expectedMaxGuardsCount = '3';
   const configMock = {
     get: jest.fn(() => expectedMaxGuardsCount)
   };
@@ -22,6 +22,14 @@ describe('Guards Service', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
+
+  const assertError = ({ error, expectedError }) => {
+    expect(loggerMock.error).toHaveBeenCalledTimes(1);
+    expect(loggerMock.error).toHaveBeenCalledWith(expectedError);
+    expect(error.status).toBe(expectedError.status);
+    expect(error.message).toBe(expectedError.message);
+    expect(error.errorCode).toBe(expectedError.errorCode);
+  };
 
   describe('Add Guard', () => {
     it('Should return created guardId', async () => {
@@ -59,7 +67,7 @@ describe('Guards Service', () => {
       const expectedError = {
         status: 403,
         message: 'Reached max guards count',
-        errorCode: "REACHED_MAX_GUARDS_COUNT"
+        errorCode: 'REACHED_MAX_GUARDS_COUNT'
       };
 
       try {
@@ -94,7 +102,7 @@ describe('Guards Service', () => {
       const expectedError = {
         status: 500,
         message: 'Failed to create guard',
-        errorCode: "FAILED_TO_CREATE_GUARD"
+        errorCode: 'FAILED_TO_CREATE_GUARD'
       };
 
       try {
@@ -114,11 +122,7 @@ describe('Guards Service', () => {
         expect(timeMachineMock.getGuardExpirationTime).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, EXPIRATION_TIME);
-        expect(loggerMock.error).toHaveBeenCalledTimes(1);
-        expect(loggerMock.error).toHaveBeenCalledWith(expectedError);
-        expect(error.status).toBe(expectedError.status);
-        expect(error.message).toBe(expectedError.message);
-        expect(error.errorCode).toBe(expectedError.errorCode);
+        assertError({ error, expectedError });
         return;
       }
 
@@ -164,7 +168,7 @@ describe('Guards Service', () => {
       const expectedError = {
         status: 404,
         message: 'Guard does not exist',
-        errorCode: "GUARD_DOES_NOT_EXIST"
+        errorCode: 'GUARD_DOES_NOT_EXIST'
       };
 
       try {
@@ -180,11 +184,8 @@ describe('Guards Service', () => {
         expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
         expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
-        expect(loggerMock.error).toHaveBeenCalledTimes(1);
-        expect(loggerMock.error).toHaveBeenCalledWith(expectedError);
-        expect(error.status).toBe(expectedError.status);
-        expect(error.message).toBe(expectedError.message);
-        expect(error.errorCode).toBe(expectedError.errorCode);
+        assertError({ error, expectedError });
+
         return;
       }
 
@@ -200,7 +201,7 @@ describe('Guards Service', () => {
       const expectedError = {
         status: 500,
         message: 'Failed to create guard',
-        errorCode: "FAILED_TO_CREATE_GUARD"
+        errorCode: 'FAILED_TO_CREATE_GUARD'
       };
 
       try {
@@ -219,11 +220,8 @@ describe('Guards Service', () => {
         expect(timeMachineMock.getGuardExpirationTime).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, EXPIRATION_TIME);
-        expect(loggerMock.error).toHaveBeenCalledTimes(1);
-        expect(loggerMock.error).toHaveBeenCalledWith(expectedError);
-        expect(error.status).toBe(expectedError.status);
-        expect(error.message).toBe(expectedError.message);
-        expect(error.errorCode).toBe(expectedError.errorCode);
+        assertError({ error, expectedError });
+
         return;
       }
 
@@ -268,7 +266,7 @@ describe('Guards Service', () => {
       const expectedError = {
         status: 404,
         message: 'Guard does not exist',
-        errorCode: "GUARD_DOES_NOT_EXIST"
+        errorCode: 'GUARD_DOES_NOT_EXIST'
       };
 
       try {
@@ -284,11 +282,8 @@ describe('Guards Service', () => {
         expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
         expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
-        expect(loggerMock.error).toHaveBeenCalledTimes(1);
-        expect(loggerMock.error).toHaveBeenCalledWith(expectedError);
-        expect(error.status).toBe(expectedError.status);
-        expect(error.message).toBe(expectedError.message);
-        expect(error.errorCode).toBe(expectedError.errorCode);
+        assertError({ error, expectedError });
+
         return;
       }
 
@@ -304,7 +299,7 @@ describe('Guards Service', () => {
       const expectedError = {
         status: 500,
         message: 'Failed to delete guard',
-        errorCode: "FAILED_TO_DELETE_GUARD"
+        errorCode: 'FAILED_TO_DELETE_GUARD'
       };
 
       try {
@@ -322,11 +317,8 @@ describe('Guards Service', () => {
         expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
         expect(guardsRepositoryMock.removeGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.removeGuard).toHaveBeenCalledWith(redisKey);
-        expect(loggerMock.error).toHaveBeenCalledTimes(1);
-        expect(loggerMock.error).toHaveBeenCalledWith(expectedError);
-        expect(error.status).toBe(expectedError.status);
-        expect(error.message).toBe(expectedError.message);
-        expect(error.errorCode).toBe(expectedError.errorCode);
+        assertError({ error, expectedError });
+
         return;
       }
 

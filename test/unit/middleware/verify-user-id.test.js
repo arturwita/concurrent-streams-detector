@@ -10,7 +10,7 @@ describe('Verify User Id', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-  })
+  });
 
   const verifyUserId = verifyUserIdFactory({ logger });
 
@@ -19,7 +19,7 @@ describe('Verify User Id', () => {
     const expectedError = {
       status: 400,
       message: `${USER_ID} header is required`,
-      errorCode: "MISSING_HEADER"
+      errorCode: 'MISSING_HEADER'
     };
 
     try {
@@ -45,8 +45,8 @@ describe('Verify User Id', () => {
 
     const expectedError = {
       status: 401,
-      message:'Unauthorized',
-      errorCode: "UNAUTHORIZED"
+      message: 'Unauthorized',
+      errorCode: 'UNAUTHORIZED'
     };
 
     try {
