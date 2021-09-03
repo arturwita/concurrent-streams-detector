@@ -15,6 +15,7 @@ fastify.setErrorHandler(errorHandler);
 fastify.setValidatorCompiler(validatorCompiler);
 
 guardRoutes.forEach(route => fastify.register(route));
+fastify.register(require("fastify-cors"));
 
 const host = process.env.APP_HOST || "127.0.0.1";
 const port = process.env.APP_PORT || 3000;
