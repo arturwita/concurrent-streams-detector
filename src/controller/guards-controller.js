@@ -8,18 +8,22 @@ const guardsControllerFactory = guardsService => {
         return guardsService.addGuard({ userId });
     };
 
-    const refreshGuard = request => {
+    const refreshGuard = async (request, reply) => {
         const { id: guardId } = request.params;
         const { [USER_ID]: userId } = request.headers;
 
-        return guardsService.refreshGuard({ guardId, userId });
+        await guardsService.refreshGuard({ guardId, userId });
+
+        reply.code(204).send();
     };
 
-    const removeGuard = request => {
+    const removeGuard = async (request, reply) => {
         const { id: guardId } = request.params;
         const { [USER_ID]: userId } = request.headers;
 
-        return guardsService.removeGuard({ guardId, userId });
+        await guardsService.removeGuard({ guardId, userId });
+
+        reply.code(204).send();
     };
 
     return {

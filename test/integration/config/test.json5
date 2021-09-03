@@ -1,0 +1,16 @@
+{
+    ajv: {
+        removeAdditional: true,
+        useDefaults: true,
+        coerceTypes: true
+    },
+    redis: {
+        port: 6379,
+        host: "redis",
+        ttlInSeconds: 90
+    },
+    app: {
+        maxGuardsCount: 3,
+        guardExpirationInSeconds: 60
+    }
+}

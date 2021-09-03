@@ -1,20 +1,18 @@
 "use strict";
 
-const dayjs = require("dayjs");
+const config = require("config");
 
-const TIME_UNIT = {
-    SECONDS: "seconds"
-};
+const timeMachineFactory = (getCurrentTimestamp = Date.now) => {
+    const EXPIRATION = Number.parseInt(config.get("app.guardExpirationInSeconds"));
 
-const timeMachineFactory = () => {
-    const addIntervalToCurrentTimestamp = ({ value, unit }) => dayjs().add(value, unit).toISOString();
+    const getGuardExpirationTime = () => {
+        const shiftedTimestamp = getCurrentTimestamp() + EXPIRATION;
+        return new Date(shiftedTimestamp);
+    }
 
     return {
-        addIntervalToCurrentTimestamp,
+        getGuardExpirationTime,
     };
 };
 
-module.exports = {
-    timeMachineFactory,
-    TIME_UNIT
-};
+module.exports = timeMachineFactory;

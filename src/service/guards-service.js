@@ -1,22 +1,20 @@
 "use strict";
 
-const { v4: getUuidV4 } = require('uuid');
+const config = require("config");
+const { v4: getUuidV4 } = require("uuid");
 const loggerFactory = require("../utils/logger");
 const CustomError = require("../error/custom-error");
 const { GUARD_DOMAIN_ERROR_CODE } = require("../error/error-codes");
-const { TIME_UNIT } = require("../utils/time-machine");
 
-const guardsServiceFactory = ({ guardsRepository, timeMachine }) => {
+const guardsServiceFactory = ({ guardsRepository, timeMachine, generateUuid = getUuidV4 }) => {
     const logger = loggerFactory("guards-service");
 
-    const { GUARD_EXPIRATION_IN_SECONDS, MAX_GUARDS_COUNT } = process.env;
-
-    const generateUuid = () => getUuidV4();
+    const MAX_GUARDS_COUNT = Number.parseInt(config.get("app.maxGuardsCount"));
 
     const addGuard = async ({ userId }) => {
         const existingGuards = await guardsRepository.getUserGuards(userId);
 
-        if (existingGuards.length === Number.parseInt(MAX_GUARDS_COUNT)) {
+        if (existingGuards.length === MAX_GUARDS_COUNT) {
             const error = {
                 status: 403,
                 message: "Reached max guards count",
@@ -30,10 +28,7 @@ const guardsServiceFactory = ({ guardsRepository, timeMachine }) => {
         const guardId = generateUuid();
         const key = guardsRepository.prepareKey({ userId, guardId });
 
-        const expirationTime = timeMachine.addIntervalToCurrentTimestamp({
-            value: GUARD_EXPIRATION_IN_SECONDS,
-            unit: TIME_UNIT.SECONDS
-        });
+        const expirationTime = timeMachine.getGuardExpirationTime();
 
         const wasSaved = await guardsRepository.saveGuard(key, expirationTime);
 
@@ -68,10 +63,7 @@ const guardsServiceFactory = ({ guardsRepository, timeMachine }) => {
             throw new CustomError(error);
         }
 
-        const updatedExpirationTime = timeMachine.addIntervalToCurrentTimestamp({
-            value: GUARD_EXPIRATION_IN_SECONDS,
-            unit: TIME_UNIT.SECONDS
-        });
+        const updatedExpirationTime = timeMachine.getGuardExpirationTime();
 
         const wasSaved = await guardsRepository.saveGuard(key, updatedExpirationTime);
 
@@ -127,8 +119,7 @@ const guardsServiceFactory = ({ guardsRepository, timeMachine }) => {
     return {
         addGuard,
         refreshGuard,
-        removeGuard,
-        generateUuid
+        removeGuard
     }
 }
 

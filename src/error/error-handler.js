@@ -21,7 +21,7 @@ module.exports = async (error, request, reply) => {
     reply.code(status);
 
     return {
-        message: error.message,
+        message: status === 500 ? "Internal server error" : error.message,
         errorCode: error.errorCode
     };
 };

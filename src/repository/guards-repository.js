@@ -1,12 +1,9 @@
 "use strict";
 
-const Redis = require("ioredis");
+const config = require("config");
 
-
-const guardsRepositoryFactory = redisConfig => {
-    const redis = new Redis(redisConfig);
-
-    const { TTL_IN_SECONDS: TTL } = process.env;
+const guardsRepositoryFactory = redis => {
+    const TTL = config.get("redis.ttlInSeconds");
     const SUCCESSFUL_SAVE_STATUS = "OK";
     const KEY_SEPARATOR = "_";
 
@@ -38,6 +35,4 @@ const guardsRepositoryFactory = redisConfig => {
     };
 };
 
-module.exports = {
-    guardsRepositoryFactory,
-};
+module.exports = guardsRepositoryFactory;
