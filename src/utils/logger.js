@@ -2,10 +2,9 @@
 
 const winston = require('winston');
 
-const loggerFactory = context => {
+const loggerFactory = () => {
   const logger = winston.createLogger({
     format: winston.format.json(),
-    defaultMeta: { context },
     transports: new winston.transports.Console(),
   });
 

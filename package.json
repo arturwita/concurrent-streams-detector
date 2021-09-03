@@ -7,7 +7,7 @@
     "test": "NODE_CONFIG_DIR=./test/unit/config/ jest test/unit --runInBand",
     "test:integration": "NODE_CONFIG_DIR=./test/integration/config/ jest test/integration --runInBand",
     "lint": "eslint --fix \"./**/*.js\" --ignore-pattern \"./.eslintignore\" --format stylish",
-    "start": "node --inspect=9229 index.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
