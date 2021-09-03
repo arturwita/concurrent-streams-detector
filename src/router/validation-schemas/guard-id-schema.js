@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
 module.exports = {
-    type: "string",
-    format: "uuid"
+  type: 'string',
+  format: 'uuid'
 };

@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
 module.exports = {
-    verbose: true,
-    forceExit: true
+  verbose: true,
+  forceExit: true
 };

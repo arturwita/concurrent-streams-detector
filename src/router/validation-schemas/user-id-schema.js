@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
 module.exports = {
-    type: "integer",
-    minimum: 1
+  type: 'integer',
+  minimum: 1
 };
