@@ -22,7 +22,7 @@ const containerFactory = ({ app, config }) => {
     app: asValue(app),
     config: asValue(config),
     logger: asFunction(loggerFactory),
-    redis: asFunction(redisFactory),
+    redis: asFunction(redisFactory).singleton(),
     timeMachine: asFunction(timeMachineFactory),
     generateUuid: asValue(getUuidV4),
     verifyUserId: asFunction(verifyUserIdFactory),
