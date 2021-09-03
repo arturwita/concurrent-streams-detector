@@ -9,6 +9,10 @@
         host: "redis",
         ttlInSeconds: 90
     },
+    fastify: {
+        ignoreTrailingSlash: true,
+        logger: true
+    },
     app: {
         maxGuardsCount: 3,
         guardExpirationInSeconds: 60

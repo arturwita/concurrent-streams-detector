@@ -1,18 +1,18 @@
-"use strict";
+'use strict';
 
-const config = require("config");
+const config = require('config');
 
 const timeMachineFactory = (getCurrentTimestamp = Date.now) => {
-    const EXPIRATION = Number.parseInt(config.get("app.guardExpirationInSeconds"));
+  const EXPIRATION = Number.parseInt(config.get('app.guardExpirationInSeconds'), 10);
 
-    const getGuardExpirationTime = () => {
-        const shiftedTimestamp = getCurrentTimestamp() + EXPIRATION;
-        return new Date(shiftedTimestamp);
-    }
+  const getGuardExpirationTime = () => {
+    const shiftedTimestamp = getCurrentTimestamp() + EXPIRATION;
+    return new Date(shiftedTimestamp);
+  };
 
-    return {
-        getGuardExpirationTime,
-    };
+  return {
+    getGuardExpirationTime,
+  };
 };
 
 module.exports = timeMachineFactory;

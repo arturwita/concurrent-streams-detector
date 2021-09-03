@@ -1,51 +1,50 @@
-"use strict";
+'use strict';
 
-const errorHandler = require("../../../src/error/error-handler");
+const errorHandler = require('../../../src/error/error-handler');
 
+describe('Error Handler', () => {
+  const replyMock = {
+    code: jest.fn(status => status),
+  };
 
-describe("Error Handler", () => {
-    const replyMock = {
-        code: jest.fn(status => status),
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('Should return error with default values', async () => {
+    const errorMock = {
+      message: 'error',
+      errorCode: 'ERROR_CODE'
     };
 
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
+    const error = await errorHandler(errorMock, {}, replyMock);
 
-    it("Should return error with default values", async () => {
-        const errorMock = {
-            message: "error",
-            errorCode: "ERROR_CODE"
-        };
+    expect(replyMock.code).toHaveReturnedWith(500);
+    expect(error.message).toEqual('Internal server error');
+    expect(error.errorCode).toEqual(errorMock.errorCode);
+  });
 
-        const error = await errorHandler(errorMock, {}, replyMock);
+  it('Should return status 400 if error has errors property', async () => {
+    const errorMock = { errors: {} };
 
-        expect(replyMock.code).toHaveReturnedWith(500);
-        expect(error.message).toEqual("Internal server error");
-        expect(error.errorCode).toEqual(errorMock.errorCode);
-    });
+    await errorHandler(errorMock, {}, replyMock);
 
-    it("Should return status 400 if error has errors property", async () => {
-        const errorMock = { errors: {} };
+    expect(replyMock.code).toHaveReturnedWith(400);
+  });
 
-        await errorHandler(errorMock, {}, replyMock);
+  it('Should return status 400 if error has validation property', async () => {
+    const errorMock = { validation: {} };
 
-        expect(replyMock.code).toHaveReturnedWith(400);
-    });
+    await errorHandler(errorMock, {}, replyMock);
 
-    it("Should return status 400 if error has validation property", async () => {
-        const errorMock = { validation: {} };
+    expect(replyMock.code).toHaveReturnedWith(400);
+  });
 
-        await errorHandler(errorMock, {}, replyMock);
+  it('Should return custom status 400 if it was provided in error object', async () => {
+    const errorMock = { status: 401 };
 
-        expect(replyMock.code).toHaveReturnedWith(400);
-    });
+    await errorHandler(errorMock, {}, replyMock);
 
-    it("Should return custom status 400 if it was provided in error object", async () => {
-        const errorMock = { status: 401 };
-
-        await errorHandler(errorMock, {}, replyMock);
-
-        expect(replyMock.code).toHaveReturnedWith(401);
-    });
+    expect(replyMock.code).toHaveReturnedWith(401);
+  });
 });
