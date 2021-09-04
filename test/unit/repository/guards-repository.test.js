@@ -3,14 +3,14 @@
 const guardsRepositoryFactory = require('../../../src/repository/guards-repository');
 
 describe('Guards Repository', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   const exampleTtl = 2;
   const config = {
     get: jest.fn(() => exampleTtl)
   };
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
   describe('Prepare Key', () => {
     it('Should properly prepare redis key', () => {

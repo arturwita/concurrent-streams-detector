@@ -11,11 +11,18 @@ describe('Error Handler', () => {
     error: jest.fn()
   };
 
+  const errorHandler = errorHandlerFactory({ logger: loggerMock });
+
+  const assertFunctionCalls = ({ errorMock, expectedStatus }) => {
+    expect(loggerMock.error).toHaveBeenCalledTimes(1);
+    expect(loggerMock.error).toHaveBeenCalledWith(errorMock);
+    expect(replyMock.code).toHaveReturnedWith(expectedStatus);
+    expect(replyMock.code).toHaveBeenCalledWith(expectedStatus);
+  };
+
   afterEach(() => {
     jest.clearAllMocks();
   });
-
-  const errorHandler = errorHandlerFactory({ logger: loggerMock });
 
   it('Should return error with default values', async () => {
     const errorMock = {
@@ -26,10 +33,7 @@ describe('Error Handler', () => {
     const error = await errorHandler(errorMock, {}, replyMock);
     const expectedStatus = 500;
 
-    expect(loggerMock.error).toHaveBeenCalledTimes(1);
-    expect(loggerMock.error).toHaveBeenCalledWith(errorMock);
-    expect(replyMock.code).toHaveReturnedWith(expectedStatus);
-    expect(replyMock.code).toHaveBeenCalledWith(expectedStatus);
+    assertFunctionCalls({ errorMock, expectedStatus });
     expect(error.message).toEqual('Internal server error');
     expect(error.errorCode).toEqual(errorMock.errorCode);
   });
@@ -42,12 +46,9 @@ describe('Error Handler', () => {
     };
 
     const error = await errorHandler(errorMock, {}, replyMock);
-
     const expectedStatus = 400;
-    expect(loggerMock.error).toHaveBeenCalledTimes(1);
-    expect(loggerMock.error).toHaveBeenCalledWith(errorMock);
-    expect(replyMock.code).toHaveReturnedWith(expectedStatus);
-    expect(replyMock.code).toHaveBeenCalledWith(expectedStatus);
+
+    assertFunctionCalls({ errorMock, expectedStatus });
     expect(error.message).toEqual(errorMock.message);
     expect(error.errorCode).toEqual(errorMock.errorCode);
   });
@@ -62,10 +63,7 @@ describe('Error Handler', () => {
     const error = await errorHandler(errorMock, {}, replyMock);
     const expectedStatus = 400;
 
-    expect(loggerMock.error).toHaveBeenCalledTimes(1);
-    expect(loggerMock.error).toHaveBeenCalledWith(errorMock);
-    expect(replyMock.code).toHaveReturnedWith(expectedStatus);
-    expect(replyMock.code).toHaveBeenCalledWith(expectedStatus);
+    assertFunctionCalls({ errorMock, expectedStatus });
     expect(error.message).toEqual(errorMock.message);
     expect(error.errorCode).toEqual(errorMock.errorCode);
   });
@@ -80,9 +78,7 @@ describe('Error Handler', () => {
 
     const error = await errorHandler(errorMock, {}, replyMock);
 
-    expect(loggerMock.error).toHaveBeenCalledTimes(1);
-    expect(loggerMock.error).toHaveBeenCalledWith(errorMock);
-    expect(replyMock.code).toHaveReturnedWith(expectedStatus);
+    assertFunctionCalls({ errorMock, expectedStatus });
     expect(error.message).toEqual(errorMock.message);
     expect(error.errorCode).toEqual(errorMock.errorCode);
   });

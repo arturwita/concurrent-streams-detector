@@ -27,11 +27,11 @@ describe('Guards Controller', () => {
     removeGuard: jest.fn(),
   };
 
+  const guardsController = guardsControllerFactory({ guardsService: guardsServiceMock });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
-
-  const guardsController = guardsControllerFactory({ guardsService: guardsServiceMock });
 
   describe('Add Guard', () => {
     it('Should call addGuard with given arguments', () => {

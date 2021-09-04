@@ -39,18 +39,18 @@ describe('Refresh Guard', () => {
     expect(expirationTimeBeforeRefresh).toBeLessThan(expirationTimeAfterRefresh);
 
     const ttlAfterRefresh = await redis.ttl(redisKey);
-    const DEFAULT_TTL = config.get('redis.ttlInSeconds');
+    const defaultTtl = config.get('redis.ttlInSeconds');
 
     expect(ttlBeforeRefresh).toBeLessThan(ttlAfterRefresh);
-    expect(ttlAfterRefresh).toBe(DEFAULT_TTL);
+    expect(ttlAfterRefresh).toBe(defaultTtl);
   });
 
   it('Should throw error when user tries to refresh guard that does not exist', async () => {
     const userId = 1;
-    const FAKE_GUARD_ID = '9296522e-cbd1-45ec-bbc9-1e6c1134bd73';
+    const fakeGuardId = '9296522e-cbd1-45ec-bbc9-1e6c1134bd73';
 
     try {
-      await sendRequest({ method: 'PATCH', userId, guardId: FAKE_GUARD_ID });
+      await sendRequest({ method: 'PATCH', userId, guardId: fakeGuardId });
     } catch (error) {
       expect(error.response.statusCode).toBe(404);
       expect(error.response.body.message).toBe('Guard does not exist');

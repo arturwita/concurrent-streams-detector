@@ -4,15 +4,23 @@ const verifyUserIdFactory = require('../../../src/middleware/verify-user-id');
 const { USER_ID } = require('../../../src/router/headers');
 
 describe('Verify User Id', () => {
-  const logger = {
+  const loggerMock = {
     error: jest.fn()
+  };
+
+  const verifyUserId = verifyUserIdFactory({ logger: loggerMock });
+
+  const assertError = ({ error, expectedError }) => {
+    expect(loggerMock.error).toHaveBeenCalledTimes(1);
+    expect(loggerMock.error).toHaveBeenCalledWith(expectedError);
+    expect(error.status).toBe(expectedError.status);
+    expect(error.message).toEqual(expectedError.message);
+    expect(error.errorCode).toEqual(expectedError.errorCode);
   };
 
   afterEach(() => {
     jest.clearAllMocks();
   });
-
-  const verifyUserId = verifyUserIdFactory({ logger });
 
   it('Should throw if user id was not passed in request headers', async () => {
     const requestMock = { headers: {} };
@@ -25,11 +33,7 @@ describe('Verify User Id', () => {
     try {
       await verifyUserId(requestMock);
     } catch (error) {
-      expect(logger.error).toHaveBeenCalledTimes(1);
-      expect(logger.error).toHaveBeenCalledWith(expectedError);
-      expect(error.status).toBe(expectedError.status);
-      expect(error.message).toEqual(expectedError.message);
-      expect(error.errorCode).toEqual(expectedError.errorCode);
+      assertError({ error, expectedError });
       return;
     }
 
@@ -52,11 +56,7 @@ describe('Verify User Id', () => {
     try {
       await verifyUserId(requestMock);
     } catch (error) {
-      expect(logger.error).toHaveBeenCalledTimes(1);
-      expect(logger.error).toHaveBeenCalledWith(expectedError);
-      expect(error.status).toBe(expectedError.status);
-      expect(error.message).toEqual(expectedError.message);
-      expect(error.errorCode).toEqual(expectedError.errorCode);
+      assertError({ error, expectedError });
       return;
     }
 
