@@ -3,24 +3,28 @@
 const guardsServiceFactory = require('../../../src/service/guards-service');
 
 describe('Guards Service', () => {
-  const EXPIRATION_TIME = '2021-09-02T11:00:00.000Z';
-  const UUID = 'abc';
+  const expirationTime = '2021-09-02T11:00:00.000Z';
+  const expectedMaxGuardsCount = '3';
+  const uuid = 'abc';
   const userId = 1;
 
   const timeMachineMock = {
-    getGuardExpirationTime: jest.fn(() => EXPIRATION_TIME)
+    getGuardExpirationTime: jest.fn(() => expirationTime)
   };
-  const generateUuidMock = jest.fn(() => UUID);
+  const generateUuidMock = jest.fn(() => uuid);
   const loggerMock = {
     error: jest.fn()
   };
-  const expectedMaxGuardsCount = '3';
   const configMock = {
     get: jest.fn(() => expectedMaxGuardsCount)
   };
 
-  afterEach(() => {
-    jest.clearAllMocks();
+  const getGuardsService = guardsRepositoryMock => guardsServiceFactory({
+    guardsRepository: guardsRepositoryMock,
+    config: configMock,
+    logger: loggerMock,
+    timeMachine: timeMachineMock,
+    generateUuid: generateUuidMock
   });
 
   const assertError = ({ error, expectedError }) => {
@@ -31,32 +35,35 @@ describe('Guards Service', () => {
     expect(error.errorCode).toBe(expectedError.errorCode);
   };
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('Add Guard', () => {
+    const redisKey = 'redis_key';
+
+    const assertAddGuardFlow = guardsRepositoryMock => {
+      expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledTimes(1);
+      expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledWith(userId);
+      expect(generateUuidMock).toHaveBeenCalledTimes(1);
+      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
+      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId: uuid });
+      expect(timeMachineMock.getGuardExpirationTime).toHaveBeenCalledTimes(1);
+      expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledTimes(1);
+      expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, expirationTime);
+    };
+
     it('Should return created guardId', async () => {
-      const redisKey = 'redis_key';
       const guardsRepositoryMock = {
         getUserGuards: jest.fn(() => ([])),
         prepareKey: jest.fn(() => redisKey),
         saveGuard: jest.fn(() => true),
       };
 
-      const { guardId } = await guardsServiceFactory({
-        guardsRepository: guardsRepositoryMock,
-        config: configMock,
-        logger: loggerMock,
-        timeMachine: timeMachineMock,
-        generateUuid: generateUuidMock
-      }).addGuard({ userId });
+      const { guardId } = await getGuardsService(guardsRepositoryMock).addGuard({ userId });
 
-      expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledTimes(1);
-      expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledWith(userId);
-      expect(generateUuidMock).toHaveBeenCalledTimes(1);
-      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
-      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId: UUID });
-      expect(timeMachineMock.getGuardExpirationTime).toHaveBeenCalledTimes(1);
-      expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledTimes(1);
-      expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, EXPIRATION_TIME);
-      expect(guardId).toBe(UUID);
+      assertAddGuardFlow(guardsRepositoryMock);
+      expect(guardId).toBe(uuid);
     });
 
     it('Should throw error when existing guards exceeded max limit', async () => {
@@ -71,21 +78,11 @@ describe('Guards Service', () => {
       };
 
       try {
-        await guardsServiceFactory({
-          guardsRepository: guardsRepositoryMock,
-          timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock,
-          logger: loggerMock,
-          config: configMock
-        }).addGuard({ userId });
+        await getGuardsService(guardsRepositoryMock).addGuard({ userId });
       } catch (error) {
         expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledWith(userId);
-        expect(loggerMock.error).toHaveBeenCalledTimes(1);
-        expect(loggerMock.error).toHaveBeenCalledWith(expectedError);
-        expect(error.status).toBe(expectedError.status);
-        expect(error.message).toBe(expectedError.message);
-        expect(error.errorCode).toBe(expectedError.errorCode);
+        assertError({ error, expectedError });
         return;
       }
 
@@ -93,7 +90,6 @@ describe('Guards Service', () => {
     });
 
     it('Should throw error when guard was not saved', async () => {
-      const redisKey = 'redis_key';
       const guardsRepositoryMock = {
         getUserGuards: jest.fn(() => ([])),
         prepareKey: jest.fn(() => redisKey),
@@ -106,22 +102,9 @@ describe('Guards Service', () => {
       };
 
       try {
-        await guardsServiceFactory({
-          guardsRepository: guardsRepositoryMock,
-          timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock,
-          logger: loggerMock,
-          config: configMock
-        }).addGuard({ userId });
+        await getGuardsService(guardsRepositoryMock).addGuard({ userId });
       } catch (error) {
-        expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.getUserGuards).toHaveBeenCalledWith(userId);
-        expect(generateUuidMock).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId: UUID });
-        expect(timeMachineMock.getGuardExpirationTime).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, EXPIRATION_TIME);
+        assertAddGuardFlow(guardsRepositoryMock);
         assertError({ error, expectedError });
         return;
       }
@@ -135,6 +118,13 @@ describe('Guards Service', () => {
     const redisKey = `${userId}_${guardId}`;
     const guardValue = '2021-09-02T22:00:00.000Z';
 
+    const assertRefreshGuardFlow = guardsRepositoryMock => {
+      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
+      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
+      expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
+      expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
+    };
+
     it('Should return refreshed guard id', async () => {
       const guardsRepositoryMock = {
         prepareKey: jest.fn(() => redisKey),
@@ -142,21 +132,12 @@ describe('Guards Service', () => {
         saveGuard: jest.fn(() => true)
       };
 
-      const { guardId: returnedGuardId } = await guardsServiceFactory({
-        guardsRepository: guardsRepositoryMock,
-        timeMachine: timeMachineMock,
-        generateUuid: generateUuidMock,
-        logger: loggerMock,
-        config: configMock
-      }).refreshGuard({ userId, guardId });
+      const { guardId: returnedGuardId } = await getGuardsService(guardsRepositoryMock).refreshGuard({ userId, guardId });
 
-      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
-      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
-      expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
-      expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
+      assertRefreshGuardFlow(guardsRepositoryMock);
       expect(timeMachineMock.getGuardExpirationTime).toHaveBeenCalledTimes(1);
       expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledTimes(1);
-      expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, EXPIRATION_TIME);
+      expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, expirationTime);
       expect(returnedGuardId).toBe(guardId);
     });
 
@@ -172,20 +153,10 @@ describe('Guards Service', () => {
       };
 
       try {
-        await guardsServiceFactory({
-          guardsRepository: guardsRepositoryMock,
-          timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock,
-          logger: loggerMock,
-          config: configMock
-        }).refreshGuard({ userId, guardId });
+        await getGuardsService(guardsRepositoryMock).refreshGuard({ userId, guardId });
       } catch (error) {
-        expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
-        expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
+        assertRefreshGuardFlow(guardsRepositoryMock);
         assertError({ error, expectedError });
-
         return;
       }
 
@@ -205,23 +176,13 @@ describe('Guards Service', () => {
       };
 
       try {
-        await guardsServiceFactory({
-          guardsRepository: guardsRepositoryMock,
-          timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock,
-          logger: loggerMock,
-          config: configMock
-        }).refreshGuard({ userId, guardId });
+        await getGuardsService(guardsRepositoryMock).refreshGuard({ userId, guardId });
       } catch (error) {
-        expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
-        expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
+        assertRefreshGuardFlow(guardsRepositoryMock);
         expect(timeMachineMock.getGuardExpirationTime).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, EXPIRATION_TIME);
+        expect(guardsRepositoryMock.saveGuard).toHaveBeenCalledWith(redisKey, expirationTime);
         assertError({ error, expectedError });
-
         return;
       }
 
@@ -234,6 +195,13 @@ describe('Guards Service', () => {
     const redisKey = `${userId}_${guardId}`;
     const guardValue = '2021-09-02T22:00:00.000Z';
 
+    const assertDeleteGuardFlow = guardsRepositoryMock => {
+      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
+      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
+      expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
+      expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
+    };
+
     it('Should return deleted guard id', async () => {
       const guardsRepositoryMock = {
         prepareKey: jest.fn(() => redisKey),
@@ -241,18 +209,9 @@ describe('Guards Service', () => {
         removeGuard: jest.fn(() => true)
       };
 
-      const { guardId: returnedGuardId } = await guardsServiceFactory({
-        guardsRepository: guardsRepositoryMock,
-        timeMachine: timeMachineMock,
-        generateUuid: generateUuidMock,
-        logger: loggerMock,
-        config: configMock
-      }).removeGuard({ userId, guardId });
+      const { guardId: returnedGuardId } = await getGuardsService(guardsRepositoryMock).removeGuard({ userId, guardId });
 
-      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
-      expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
-      expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
-      expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
+      assertDeleteGuardFlow(guardsRepositoryMock);
       expect(guardsRepositoryMock.removeGuard).toHaveBeenCalledTimes(1);
       expect(guardsRepositoryMock.removeGuard).toHaveBeenCalledWith(redisKey);
       expect(returnedGuardId).toBe(guardId);
@@ -270,20 +229,10 @@ describe('Guards Service', () => {
       };
 
       try {
-        await guardsServiceFactory({
-          guardsRepository: guardsRepositoryMock,
-          timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock,
-          logger: loggerMock,
-          config: configMock
-        }).removeGuard({ userId, guardId });
+        await getGuardsService(guardsRepositoryMock).removeGuard({ userId, guardId });
       } catch (error) {
-        expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
-        expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
+        assertDeleteGuardFlow(guardsRepositoryMock);
         assertError({ error, expectedError });
-
         return;
       }
 
@@ -303,22 +252,12 @@ describe('Guards Service', () => {
       };
 
       try {
-        await guardsServiceFactory({
-          guardsRepository: guardsRepositoryMock,
-          timeMachine: timeMachineMock,
-          generateUuid: generateUuidMock,
-          logger: loggerMock,
-          config: configMock
-        }).removeGuard({ userId, guardId });
+        await getGuardsService(guardsRepositoryMock).removeGuard({ userId, guardId });
       } catch (error) {
-        expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.prepareKey).toHaveBeenCalledWith({ userId, guardId });
-        expect(guardsRepositoryMock.getGuard).toHaveBeenCalledTimes(1);
-        expect(guardsRepositoryMock.getGuard).toHaveBeenCalledWith(redisKey);
+        assertDeleteGuardFlow(guardsRepositoryMock);
         expect(guardsRepositoryMock.removeGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.removeGuard).toHaveBeenCalledWith(redisKey);
         assertError({ error, expectedError });
-
         return;
       }
 

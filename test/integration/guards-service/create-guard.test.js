@@ -32,16 +32,16 @@ describe('Create Guard', () => {
   });
 
   it('Should throw error when user tries to create more than max guards', async () => {
-    const MAX_GUARDS_COUNT = config.get('app.maxGuardsCount');
+    const maxGuardsCount = config.get('app.maxGuardsCount');
     const userId = 1;
 
-    for (let i = 0; i < MAX_GUARDS_COUNT; i++) {
+    for (let i = 0; i < maxGuardsCount; i++) {
       await sendRequest({ method: 'POST', userId });
     }
 
     const userKeysRegex = `${userId}_*`;
     const userGuards = await redis.keys(userKeysRegex);
-    expect(userGuards.length).toBe(MAX_GUARDS_COUNT);
+    expect(userGuards.length).toBe(maxGuardsCount);
 
     try {
       await sendRequest({ method: 'POST', userId });

@@ -35,10 +35,10 @@ describe('Delete Guard', () => {
 
   it('Should throw error when user tries to delete guard that does not exist', async () => {
     const userId = 1;
-    const FAKE_GUARD_ID = '9296522e-cbd1-45ec-bbc9-1e6c1134bd73';
+    const fakeGuardId = '9296522e-cbd1-45ec-bbc9-1e6c1134bd73';
 
     try {
-      await sendRequest({ method: 'DELETE', userId, guardId: FAKE_GUARD_ID });
+      await sendRequest({ method: 'DELETE', userId, guardId: fakeGuardId });
     } catch (error) {
       expect(error.response.statusCode).toBe(404);
       expect(error.response.body.message).toBe('Guard does not exist');
