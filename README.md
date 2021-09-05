@@ -32,12 +32,7 @@ npm run test:integration
 npm install
 ```
 
-3. Start Redis:
-```
-docker-compose up --build
-```
-
-4. Start the application:
+3. Start the application:
 ```
 npm run start
 ```
