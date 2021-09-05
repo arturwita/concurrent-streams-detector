@@ -1,4 +1,4 @@
-## Service Flow:
+## Service Flow
 
 Service flow is shown on Picture 1.
 
@@ -6,24 +6,24 @@ Service flow is shown on Picture 1.
 **Picture 1.** *Service flow.*
 
 
-## Endpoints:
+## Endpoints
 
 ### 1. POST */guards*
 
-### Request:
+### Request
 - Headers:
     - `x-user-id` - *contains user ID*
 
-### Response:
+### Response
 
-#### :white_check_mark: Successful response (200):
+#### :white_check_mark: Successful response (200)
 ```JSON
 {
     "guardId": "cf0190e1-285d-4967-97f3-b0738e56766a"
 }
 ```
 
-#### :x: Trying to create an excess guard (403):
+#### :x: Trying to create an excess guard (403)
 ```JSON
 {
     "message": "Reached max guards count",
@@ -31,7 +31,7 @@ Service flow is shown on Picture 1.
 }
  ```
 
-#### :x: Guard did not save (500):
+#### :x: Guard did not save (500)
 ```JSON
 {
     "message": "Failed to create guard",
@@ -39,7 +39,7 @@ Service flow is shown on Picture 1.
 }
  ```
 
-#### :x: Unexpected error (500):
+#### :x: Unexpected error (500)
 ```JSON
 {
     "message": "An error occurred while creating guard",
@@ -51,22 +51,22 @@ Service flow is shown on Picture 1.
 
 ### 2. PATCH */guards/`:id`*
 
-### Request:
+### Request
 - Headers:
     - `x-user-id` - *contains user ID*
 - Params:
     - `id` - *guard ID*
 
-### Response:
+### Response
 
-#### :white_check_mark: Successful response (200):
+#### :white_check_mark: Successful response (200)
 ```JSON
 {
     "guardId": "cf0190e1-285d-4967-97f3-b0738e56766a"
 }
 ```
 
-#### :x: Trying to refresh non-existent guard (404):
+#### :x: Trying to refresh non-existent guard (404)
 ```JSON
 {
     "message": "Guard does not exist",
@@ -74,7 +74,7 @@ Service flow is shown on Picture 1.
 }
  ```
 
-#### :x: Guard did not save (500):
+#### :x: Guard did not save (500)
 ```JSON
 {
     "message": "Failed to create guard",
@@ -82,7 +82,7 @@ Service flow is shown on Picture 1.
 }
  ```
 
-#### :x: Unexpected error (500):
+#### :x: Unexpected error (500)
 ```JSON
 {
     "message": "An error occurred while refreshing guard",
@@ -94,22 +94,22 @@ Service flow is shown on Picture 1.
 
 ### 3. DELETE */guards/`:id`*
 
-### Request:
+### Request
 - Headers:
     - `x-user-id` - *contains user ID*
 - Params:
     - `id` - *guard ID*
 
-### Response:
+### Response
 
-#### :white_check_mark: Successful response (200):
+#### :white_check_mark: Successful response (200)
 ```JSON
 {
     "guardId": "cf0190e1-285d-4967-97f3-b0738e56766a"
 }
 ```
 
-#### :x: Trying to delete non-existent guard (404):
+#### :x: Trying to delete non-existent guard (404)
 ```JSON
 {
     "message": "Guard does not exist",
@@ -117,7 +117,7 @@ Service flow is shown on Picture 1.
 }
  ```
 
-#### :x: Guard was not deleted (500):
+#### :x: Guard was not deleted (500)
 ```JSON
 {
     "message": "Failed to delete guard",
@@ -125,7 +125,7 @@ Service flow is shown on Picture 1.
 }
  ```
 
-#### :x: Unexpected error (500):
+#### :x: Unexpected error (500)
 ```JSON
 {
     "message": "An error occurred while deleting guard",

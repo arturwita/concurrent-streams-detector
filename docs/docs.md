@@ -1,4 +1,4 @@
-# Service functionality:
+# Service functionality
 
 According to a fragment of the task description:
 > This API will be involved every time a new user wants to watch new content,
@@ -34,7 +34,7 @@ You might have noticed an extra interval of 30 seconds between
 the default 60 seconds of stream's accessibility stored in a guard, and its time to live set to 90 seconds. 
 It was designed to ensure that a guard can be refreshed, even when a user experiences some network issues, latencies etc. 
 
-## Endpoints:
+## Endpoints
 
 The server consists of 3 endpoints:
 
@@ -48,16 +48,16 @@ A detailed documentation can be found [here](endpoints.md).
 
 --- 
 
-## Tech stack:
+## Tech stack
 
 Speed is one of the most crucial things in terms of video streaming. 
-That is why I decided to use the fastest technologies I've heard about.
+That is why I decided to use the fastest suitable technologies.
 
 - **Server:** *Fastify*
 - **Database:** *Redis*
 
 
-## Scalability:
+## Scalability
 
 Scalability is also an important factor. As the number of users would grow,
 this service could be scaled in the following ways:
@@ -71,7 +71,7 @@ There are a few ways to scale the database layer:
 
 1. #### Vertical scaling
 Vertical scaling is probably the easiest way to scale Redis.
-It means adding more memory but the more additional memory we need, the more expensive this method gets.
+It means adding more memory and CPU but the more additional memory we need, the more expensive this method gets.
 Despite costs, there is also one serious drawback - at some point, we would get to an end, when we can't add more memory. 
 
 2. #### Sharding
@@ -85,7 +85,7 @@ There are some problems to be aware of (e.g. orchestrating database reads & writ
 that we don't lose information about any existing user guards).
 
 
-## Logging:
+## Logging
 The more users an application has, the more important application monitoring becomes.
 In that case, logs could be improved by:
 - structuring them,
@@ -93,10 +93,10 @@ In that case, logs could be improved by:
 - setting log level dynamically
 
 
-## Monitoring:
+## Monitoring
 There are 2 major things to monitor: application and Redis.
 
-### Application:
+### Application
 Useful application metrics:
 - Status code and response time per each endpoint
 - RPS (Requests Per Second)
