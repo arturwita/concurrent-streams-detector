@@ -1,6 +1,7 @@
 'use strict';
 
 const guardsServiceFactory = require('../../../src/service/guards-service');
+const CustomError = require("../../../src/error/custom-error");
 
 describe('Guards Service', () => {
   const expirationTime = '2021-09-02T11:00:00.000Z';
@@ -111,6 +112,60 @@ describe('Guards Service', () => {
 
       fail('Test should not reach here');
     });
+
+    it('Should throw custom error when when an unexpected error occurred', async () => {
+      const expectedError = {
+        status: 500,
+        message: 'An error occurred while creating guard',
+        errorCode: 'COULD_NOT_CREATE_GUARD'
+      };
+
+      const guardsRepositoryMock = {
+        getUserGuards: jest.fn(() => {
+          throw new Error('unexpected error');
+        }),
+        prepareKey: jest.fn(() => redisKey),
+        saveGuard: jest.fn(() => false),
+      };
+
+      try {
+        await getGuardsService(guardsRepositoryMock).addGuard({ userId });
+      } catch (error) {
+        assertError({ error, expectedError });
+
+        return;
+      }
+
+      fail('Test should not reach here');
+    });
+
+    it('Should throw custom error when when an expected error occurred', async () => {
+      const expectedError = {
+        status: 500,
+        message: 'An error occurred while creating guard',
+        errorCode: 'COULD_NOT_CREATE_GUARD'
+      };
+
+      const guardsRepositoryMock = {
+        getUserGuards: jest.fn(() => {
+          throw new CustomError(expectedError)
+        }),
+        prepareKey: jest.fn(() => redisKey),
+        saveGuard: jest.fn(() => false)
+      };
+
+      try {
+        await getGuardsService(guardsRepositoryMock).addGuard({ userId });
+      } catch (error) {
+        expect(error.status).toBe(expectedError.status);
+        expect(error.message).toBe(expectedError.message);
+        expect(error.errorCode).toBe(expectedError.errorCode);
+
+        return;
+      }
+
+      fail('Test should not reach here');
+    });
   });
 
   describe('Refresh Guard', () => {
@@ -188,6 +243,61 @@ describe('Guards Service', () => {
 
       fail('Test should not reach here');
     });
+
+    it('Should throw custom error when when an unexpected error occurred', async () => {
+      const expectedError = {
+        status: 500,
+        message: 'An error occurred while refreshing guard',
+        errorCode: 'COULD_NOT_REFRESH_GUARD'
+      };
+
+      const guardsRepositoryMock = {
+        prepareKey: jest.fn(() => {
+          throw new Error('unexpected error');
+        }),
+        getGuard: jest.fn(() => guardValue),
+        saveGuard: jest.fn(() => false)
+      };
+
+      try {
+        await getGuardsService(guardsRepositoryMock).refreshGuard({ userId });
+      } catch (error) {
+        assertError({ error, expectedError });
+
+        return;
+      }
+
+      fail('Test should not reach here');
+    });
+
+    it('Should throw custom error when when an expected error occurred', async () => {
+      const expectedError = {
+        status: 500,
+        message: 'An error occurred while refreshing guard',
+        errorCode: 'COULD_NOT_REFRESH_GUARD'
+      };
+
+      const guardsRepositoryMock = {
+        prepareKey: jest.fn(() => {
+          throw new CustomError(expectedError)
+        }),
+        getGuard: jest.fn(() => guardValue),
+        saveGuard: jest.fn(() => false)
+      };
+
+      try {
+        await getGuardsService(guardsRepositoryMock).refreshGuard({ userId });
+      } catch (error) {
+        expect(error.status).toBe(expectedError.status);
+        expect(error.message).toBe(expectedError.message);
+        expect(error.errorCode).toBe(expectedError.errorCode);
+
+        return;
+      }
+
+      fail('Test should not reach here');
+    });
+
   });
 
   describe('Remove Guard', () => {
@@ -258,6 +368,60 @@ describe('Guards Service', () => {
         expect(guardsRepositoryMock.removeGuard).toHaveBeenCalledTimes(1);
         expect(guardsRepositoryMock.removeGuard).toHaveBeenCalledWith(redisKey);
         assertError({ error, expectedError });
+        return;
+      }
+
+      fail('Test should not reach here');
+    });
+
+    it('Should throw custom error when when an unexpected error occurred', async () => {
+      const expectedError = {
+        status: 500,
+        message: 'An error occurred while deleting guard',
+        errorCode: 'COULD_NOT_DELETE_GUARD'
+      };
+
+      const guardsRepositoryMock = {
+        prepareKey: jest.fn(() => {
+          throw new Error('unexpected error');
+        }),
+        getGuard: jest.fn(() => guardValue),
+        removeGuard: jest.fn(() => false)
+      };
+
+      try {
+        await getGuardsService(guardsRepositoryMock).removeGuard({ userId, guardId });
+      } catch (error) {
+        assertError({ error, expectedError });
+
+        return;
+      }
+
+      fail('Test should not reach here');
+    });
+
+    it('Should throw custom error when when an expected error occurred', async () => {
+      const expectedError = {
+        status: 500,
+        message: 'An error occurred while deleting guard',
+        errorCode: 'COULD_NOT_DELETE_GUARD'
+      };
+
+      const guardsRepositoryMock = {
+        prepareKey: jest.fn(() => {
+          throw new CustomError(expectedError)
+        }),
+        getGuard: jest.fn(() => guardValue),
+        removeGuard: jest.fn(() => false)
+      };
+
+      try {
+        await getGuardsService(guardsRepositoryMock).removeGuard({ userId, guardId });
+      } catch (error) {
+        expect(error.status).toBe(expectedError.status);
+        expect(error.message).toBe(expectedError.message);
+        expect(error.errorCode).toBe(expectedError.errorCode);
+
         return;
       }
 
