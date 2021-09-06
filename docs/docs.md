@@ -7,7 +7,7 @@ According to a fragment of the task description:
 the flow was based on creating a **guard** whenever a user wants to watch a stream.
 
 ### What is a guard?
-A guard contains information about the expiration time, until which the user can view a stream.
+A guard contains information about the expiration time, until which it should be refreshed if the user continues to watch a stream.
 The expiration time is calculated by adding a given interval to the timestamp of the guard’s creation time. (by default set to `60 seconds`)
 
 ### Are users able to watch only 60 seconds of a stream?
