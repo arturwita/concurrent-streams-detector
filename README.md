@@ -9,11 +9,19 @@ This API will be involved every time a new user wants to watch new content, so i
 
 
 ## Installation
+The application can be run in two ways. There are some common steps to take before running the application with docker or manually:
+1. Create a `.env` file in the project's root directory and set all required environment variables there.
+    An example file can be found [here](.env.example).
+   
+2. Install project's dependencies:
+```   
+npm install
+```
 
 ### a) Docker approach
-1. Open two terminals in the project's root directory
+3. Open two terminals in the project's root directory
 
-2. In the first terminal, run the application:
+4. In the first terminal, run the application:
 ```
 docker-compose up --build
 ```
@@ -24,13 +32,6 @@ npm run test:integration
 ```
 
 ### b) Manual approach
-1. Create a `.env` file in the project's root directory and set all required environment variables there.
-    An example file can be found [here](.env.example).
-   
-2. Install project's dependencies:
-```   
-npm install
-```
 
 3. Start the application:
 ```
